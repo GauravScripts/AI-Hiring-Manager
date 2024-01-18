@@ -16,6 +16,10 @@
     <properties>
         <java.version>17</java.version>
     </properties>
+    <packaging>pom</packaging>
+    <modules>
+        <module>assessment-service</module>
+    </modules>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
