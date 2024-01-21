@@ -23,45 +23,46 @@ import java.util.Collections;
 public class PdfController {
     String gemini_api_key = System.getenv("gemini_api");
 
-    @PostMapping("/api/pdf")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        PDDocument document = PDDocument.load(file.getInputStream());
-        PDFTextStripper pdfStripper = new PDFTextStripper();
-        String text = pdfStripper.getText(document);
-        document.close();
+@PostMapping("/api/pdf")
+public String handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("text") String job_description ) throws IOException {
+    PDDocument document = PDDocument.load(file.getInputStream());
+    PDFTextStripper pdfStripper = new PDFTextStripper();
+    String text = pdfStripper.getText(document);
+    document.close();
+    text += "analysis this text and tell me how much marks will you give out of 10 to this resume will recruit above resume for this" + job_description+ " will you select this candidate for this role for interview if then say Ha if no then say Nhi ";
 
-        JSONObject part = new JSONObject();
-        part.put("text", text);
+    JSONObject part = new JSONObject();
+    part.put("text", text);
 
-        JSONArray parts = new JSONArray();
-        parts.put(part);
+    JSONArray parts = new JSONArray();
+    parts.put(part);
 
-        JSONObject content = new JSONObject();
-        content.put("parts", parts);
+    JSONObject content = new JSONObject();
+    content.put("parts", parts);
 
-        JSONArray contents = new JSONArray();
-        contents.put(content);
+    JSONArray contents = new JSONArray();
+    contents.put(content);
 
-        JSONObject bodyObject = new JSONObject();
-        bodyObject.put("contents", contents);
+    JSONObject bodyObject = new JSONObject();
+    bodyObject.put("contents", contents);
 
-        String body = bodyObject.toString();
+    String body = bodyObject.toString();
 
-        RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = new RestTemplate();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Content-Type", "application/json");
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+    headers.set("Content-Type", "application/json");
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+    HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="+gemini_api_key,
-                HttpMethod.POST,
-                entity,
-                String.class);
+    ResponseEntity<String> response = restTemplate.exchange(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="+gemini_api_key,
+            HttpMethod.POST,
+            entity,
+            String.class);
 
-        return response.getBody();
-    }
+    return response.getBody();
+}
 }
